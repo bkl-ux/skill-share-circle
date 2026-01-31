@@ -181,3 +181,4 @@ const TutorProfile = () => {
     </div>
   );
 };
+export default TutorProfile;
