@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Search, TrendingUp, Sparkles, ArrowRight, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
@@ -7,54 +8,20 @@ import CreditBadge from "@/components/ui/CreditBadge";
 import SkillTag from "@/components/ui/SkillTag";
 import SessionCard from "@/components/ui/SessionCard";
 import RequestCard from "@/components/ui/RequestCard";
+import TopUpDialog from "@/components/TopUpDialog";
 import { useProfile } from "@/hooks/useProfile";
 
 const hotTopics = [
   "Photography", "Public Speaking", "UI/UX Design", "Python", "Guitar", "Cooking"
 ];
 
-const upcomingSessions = [
-  {
-    tutorName: "Sarah J.",
-    topic: "Intro to UX Design",
-    date: "Today",
-    time: "4:00 PM",
-    duration: "1 hour",
-    status: "upcoming" as const,
-  },
-  {
-    tutorName: "Michael R.",
-    topic: "Advanced Python",
-    date: "Tomorrow",
-    time: "2:00 PM",
-    duration: "45 min",
-    status: "upcoming" as const,
-  },
-];
-
-const activeRequests = [
-  {
-    name: "Spanish Tutor",
-    topic: "Conversational Spanish",
-    message: "Perfect! 2 hours ago",
-    timeAgo: "2h",
-    type: "outgoing" as const,
-    status: "pending" as const,
-  },
-  {
-    name: "Chess Lessons",
-    topic: "Chess Strategy",
-    message: "Posted 1 day ago",
-    timeAgo: "1d",
-    type: "incoming" as const,
-    status: "pending" as const,
-  },
-];
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const { profile } = useProfile();
   const displayName = profile?.name ?? "there";
+  const [topUpOpen, setTopUpOpen] = useState(false);
+  const upcomingSessions: Array<{ tutorName: string; topic: string; date: string; time: string; duration: string; status: "upcoming" }> = [];
+  const activeRequests: Array<{ name: string; topic: string; message: string; timeAgo: string; type: "outgoing" | "incoming"; status: "pending" }> = [];
 
   return (
     <AppLayout title="Skill Share Circle">
@@ -80,6 +47,7 @@ const Dashboard = () => {
             <Button 
               size="sm" 
               className="mt-3 rounded-full bg-primary hover:bg-primary/90"
+              onClick={() => setTopUpOpen(true)}
             >
               <Plus className="h-4 w-4 mr-1" />
               Top Up
@@ -123,15 +91,17 @@ const Dashboard = () => {
         <section className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-foreground">Upcoming Sessions</h3>
-            <button className="text-sm text-primary hover:underline flex items-center gap-1">
-              View all
-              <ArrowRight className="h-4 w-4" />
-            </button>
           </div>
           <div className="space-y-3">
-            {upcomingSessions.map((session, i) => (
-              <SessionCard key={i} {...session} />
-            ))}
+            {upcomingSessions.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4 text-center rounded-2xl border border-border/50 bg-card">
+                No upcoming sessions. Book a tutor from Search.
+              </p>
+            ) : (
+              upcomingSessions.map((session, i) => (
+                <SessionCard key={i} {...session} />
+              ))
+            )}
           </div>
         </section>
 
@@ -139,12 +109,20 @@ const Dashboard = () => {
         <section className="animate-fade-in" style={{ animationDelay: "0.4s" }}>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-foreground">Active Requests</h3>
-            <button className="text-sm text-primary hover:underline">See all</button>
+            <button className="text-sm text-primary hover:underline" onClick={() => navigate("/messages")}>
+              See all
+            </button>
           </div>
           <div className="space-y-3">
-            {activeRequests.map((request, i) => (
-              <RequestCard key={i} {...request} />
-            ))}
+            {activeRequests.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-4 text-center rounded-2xl border border-border/50 bg-card">
+                No active requests. Send a request from a tutor profile.
+              </p>
+            ) : (
+              activeRequests.map((request, i) => (
+                <RequestCard key={i} {...request} />
+              ))
+            )}
           </div>
         </section>
 
@@ -165,7 +143,12 @@ const Dashboard = () => {
                 </p>
                 <div className="flex items-center gap-3 mt-3">
                   <CreditBadge credits={0.5} size="sm" />
-                  <Button size="sm" variant="outline" className="rounded-full border-primary text-primary hover:bg-primary/10">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full border-primary text-primary hover:bg-primary/10"
+                    onClick={() => navigate("/ai")}
+                  >
                     Start AI Session
                     <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
@@ -175,6 +158,7 @@ const Dashboard = () => {
           </div>
         </section>
       </div>
+      <TopUpDialog open={topUpOpen} onOpenChange={setTopUpOpen} />
     </AppLayout>
   );
 };

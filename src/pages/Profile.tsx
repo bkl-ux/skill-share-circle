@@ -1,4 +1,5 @@
 import { Camera, Edit2, ChevronRight, LogOut, Settings, HelpCircle, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import AppLayout from "@/components/layout/AppLayout";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -7,16 +8,16 @@ import { cn } from "@/lib/utils";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/contexts/AuthContext";
 
-const menuItems = [
-  { icon: Edit2, label: "Edit Profile", action: () => {} },
-  { icon: Settings, label: "Settings", action: () => {} },
-  { icon: Shield, label: "Privacy & Security", action: () => {} },
-  { icon: HelpCircle, label: "Help & Support", action: () => {} },
-];
-
 const Profile = () => {
+  const navigate = useNavigate();
   const { profile, isLoading } = useProfile();
   const { signOut } = useAuth();
+  const menuItems = [
+    { icon: Edit2, label: "Edit Profile", href: "/profile/edit" },
+    { icon: Settings, label: "Settings", href: "/settings" },
+    { icon: Shield, label: "Privacy & Security", href: "/settings#privacy" },
+    { icon: HelpCircle, label: "Help & Support", href: "/help" },
+  ];
 
   const name = profile?.name ?? "User";
   const initials = name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase() || "U";
@@ -83,7 +84,7 @@ const Profile = () => {
           {menuItems.map((item) => (
             <button
               key={item.label}
-              onClick={item.action}
+              onClick={() => item.href && navigate(item.href)}
               className={cn(
                 "w-full flex items-center gap-3 p-4 rounded-2xl",
                 "bg-card border border-border/50",

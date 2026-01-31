@@ -8,7 +8,7 @@ export type Profile = Tables<"profiles">;
 export function useProfile() {
   const { user } = useAuth();
 
-  const { data: profile, isLoading, error } = useQuery({
+  const { data: profile, isLoading, error, refetch } = useQuery({
     queryKey: ["profile", user?.id],
     queryFn: async (): Promise<Profile | null> => {
       if (!user?.id) return null;
@@ -23,5 +23,5 @@ export function useProfile() {
     enabled: !!user?.id,
   });
 
-  return { profile, isLoading, error };
+  return { profile, isLoading, error, refetch };
 }
